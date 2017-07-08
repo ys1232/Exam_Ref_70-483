@@ -43,6 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C1_Listing1_21.cs" />
+    <Compile Include="C1_Listing22_74.cs" />
+    <Compile Include="C1_Listing75_98.cs" />
+    <Compile Include="C2_Listing1_40.cs" />
+    <Compile Include="C2_Listing41_78.cs" />
+    <Compile Include="C2_Listing79_100.cs" />
+    <Compile Include="C3_Listing1_28.cs" />
+    <Compile Include="C3_Listing29_54.cs" />
+    <Compile Include="C4_Listing1_47.cs" />
+    <Compile Include="Console_Holding.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
