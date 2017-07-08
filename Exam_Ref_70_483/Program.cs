@@ -10,7 +10,8 @@ namespace Exam_Ref_70_483
     {
         static void Main(string[] args)
         {
-            Listing1_1.TestThreadMethod();
+            #region chapter1
+            //Listing1_1.TestThreadMethod();
             //Listing1_2.CallThreadMethod();
             //Listing1_3.CallThreadMethod();
             //Listing1_4.stopThread();
@@ -117,7 +118,9 @@ namespace Exam_Ref_70_483
             //C1_Listing95.Test_ReThrow_Exception();
             //C1_Listing96.Test_Adding_To_Original_Exception();
             //C1_Listing97.Test_Use_ExceptionDispatchInfo();
+            #endregion
 
+            #region chapter2
             // -------------------------------chapter 2 ---------------------
             //C2_Listing1.Test_Enum();
             //new C2_Listing2();   // there is not much you can do in this example
@@ -176,8 +179,9 @@ namespace Exam_Ref_70_483
             //C2_Listing97_98.Test_Display_Formatted_Strings();
             //C2_Listing99.Test_Custom_Format_Method();
             //C2_Listing100.Test_Create_Composite_String_Format();
+            #endregion
 
-
+            #region Chapter3
             // ---------------------------- Chapter 3 ----------------------------
             //C3_Listing4_6.Test_Parse_TryParse();
             //C3_Listing7_8.Test_Convert();
@@ -201,6 +205,7 @@ namespace Exam_Ref_70_483
             //C3_Listing51.Test_Write_Data_To_EvntLog();
             //C3_Listing52.Test_StopWatchClass();
             //C3_Listing52.Test_Profiler();
+            #endregion
 
 
             // ------------------------- Chapter 4 ----------------------
@@ -224,6 +229,7 @@ namespace Exam_Ref_70_483
             //C4_Listing23.Test_WriteAsync();
             //C4_Listing24.Test_GetStringAsync();
             //await C4_Listing25.ExecuteMultipleRequests();
+            C4_Listing27.Test_SqlConnection();
         }
     }
 }

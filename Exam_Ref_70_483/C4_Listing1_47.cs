@@ -440,7 +440,11 @@ namespace Exam_Ref_70_483
         {
             using (SqlConnection connection = new SqlConnection("Data Source = HUICHEN;Integrated Security=true;Initial Catalog=Hui"))
             {
-
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("select count(1) from dbo.student", connection);
+                object CNT = cmd.ExecuteScalar();
+                Console.WriteLine("The count is:{0}", CNT.ToString());
+                Console.ReadKey();
             }
         }
     }
