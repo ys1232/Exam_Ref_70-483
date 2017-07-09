@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace Exam_Ref_70_483
 {
@@ -447,10 +448,51 @@ namespace Exam_Ref_70_483
                 Console.ReadKey();
             }
         }
+
+        public static void Test_SqlConnection(string ConnStr)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnStr))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("select count(1) from dbo.student", connection);
+                object CNT = cmd.ExecuteScalar();
+                Console.WriteLine("The count is:{0}", CNT.ToString());
+                Console.ReadKey();
+            }
+        }
     }
 
     class C4_Listing28
     {
+        public static void Test_SqlConnStrBuilder()
+        {
+            var sqlConnectionStringBuilder = new SqlConnectionStringBuilder();
 
+            sqlConnectionStringBuilder.DataSource = @"HUICHEN";
+            sqlConnectionStringBuilder.InitialCatalog = "Hui";
+            sqlConnectionStringBuilder.IntegratedSecurity = true;
+
+            string connectionString = sqlConnectionStringBuilder.ToString();
+            Console.WriteLine("C4_Listing28, ConnStr is:{0}", connectionString);
+
+            C4_Listing27.Test_SqlConnection(connectionString);
+        }
     }
+
+
+    class C4_Listing29_30
+    {
+        public static void Test_Config_File()
+        {
+            // use the demo to use App.config file to get connstr and customized variable value
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
+            Console.WriteLine("C4_Listing29_30, ConnStr is:{0}", connectionString);
+
+            string Setting_Value = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings.Settings["Setting1"].Value.ToString();
+            Console.WriteLine("C4_Listing29_30, Setting1 is:{0}", Setting_Value);
+            C4_Listing27.Test_SqlConnection(connectionString);
+        }
+    }
+
+
 }

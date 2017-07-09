@@ -229,7 +229,9 @@ namespace Exam_Ref_70_483
             //C4_Listing23.Test_WriteAsync();
             //C4_Listing24.Test_GetStringAsync();
             //await C4_Listing25.ExecuteMultipleRequests();
-            C4_Listing27.Test_SqlConnection();
+            //C4_Listing27.Test_SqlConnection();
+            //C4_Listing28.Test_SqlConnStrBuilder();
+            C4_Listing29_30.Test_Config_File();
         }
     }
 }
