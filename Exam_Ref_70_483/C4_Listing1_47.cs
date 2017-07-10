@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Transactions;
+using System.Data.Entity;
+using System.Xml;
 
 namespace Exam_Ref_70_483
 {
@@ -16,7 +19,7 @@ namespace Exam_Ref_70_483
     class C4_Listing1   // tried whatever I can, still cannot install DriveInfo class successfully
     {
         public static void Test_Listing_Drive_Info()
-        {           
+        {
             //DriveInfo[] drivesInfo = DriveInfo.GetDrives();
         }
     }
@@ -299,7 +302,7 @@ namespace Exam_Ref_70_483
 
             FileInfo uncompressedFile = new FileInfo(uncompressedFilePath);
             FileInfo compressedFile = new FileInfo(compressedFilePath);
-            
+
             Console.WriteLine("uncompressedFile.Length:" + uncompressedFile.Length);
             Console.WriteLine("compressedFile.Length:" + compressedFile.Length);
             Console.ReadLine();
@@ -354,16 +357,16 @@ namespace Exam_Ref_70_483
     {
         public static void Test_executing_WebRequest_and_WebResponse()
         {
-        //    WebRequest request = WebRequest.Create("http://www.microsoft.com");
-        //    WebResponse response = request.GetResponse();  // cannot use GetResponse method. Try to use GetResponseAsync method and task to implement later
+            //    WebRequest request = WebRequest.Create("http://www.microsoft.com");
+            //    WebResponse response = request.GetResponse();  // cannot use GetResponse method. Try to use GetResponseAsync method and task to implement later
 
-        //    StreamReader responseStream = new StreamReader(response.GetResponseStream());
-        //    string responseText = responseStream.ReadToEnd();
+            //    StreamReader responseStream = new StreamReader(response.GetResponseStream());
+            //    string responseText = responseStream.ReadToEnd();
 
-        //    Console.WriteLine(responseText);
-        //    Console.ReadKey();
+            //    Console.WriteLine(responseText);
+            //    Console.ReadKey();
 
-        //    response.Close();
+            //    response.Close();
         }
     }
 
@@ -382,7 +385,7 @@ namespace Exam_Ref_70_483
 
         public static void Test_WriteAsync()
         {
-            Console.WriteLine("The returned task status is:{0}",CreateAndWriteAsyncToFile().Status.ToString());
+            Console.WriteLine("The returned task status is:{0}", CreateAndWriteAsyncToFile().Status.ToString());
             Console.ReadLine();
         }
 
@@ -403,7 +406,7 @@ namespace Exam_Ref_70_483
         public static async void Test_GetStringAsync()
         {
             await ReadAsyncHttpRequest();
-            
+
         }
     }
 
@@ -420,7 +423,7 @@ namespace Exam_Ref_70_483
             Console.ReadLine();
         }
     }
-    
+
     class C4_Listing26
     {
         public async Task ExecuteMultipleRequestsInParallel()
@@ -494,5 +497,264 @@ namespace Exam_Ref_70_483
         }
     }
 
+    class C4_Listing32
+    {
+        public static async Task Test_Async_Select_execution()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
 
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand("select * from student", conn);
+                await conn.OpenAsync();
+
+                using (SqlDataReader dataReader = await command.ExecuteReaderAsync())
+                {
+                    while (await dataReader.ReadAsync())
+                    {
+                        string formatStringNameWithMiddleName = "Person is named {0} {1} {2}";
+                        string formatStringNameWithoutMiddleName = "Person is named {0} {1}";
+
+                        if ((dataReader["MiddleName"] != null))
+                            Console.WriteLine(formatStringNameWithMiddleName, dataReader["FirstName"], dataReader["MiddleName"], dataReader["LastName"]);
+                        else
+                            Console.WriteLine(formatStringNameWithoutMiddleName, dataReader["FirstName"], dataReader["LastName"]);
+                    }
+                }
+                Console.ReadLine();
+            }
+
+        }
+    }
+
+    class C4_Listing33
+    {
+        public static async Task Test_Async_Select_MultipleResultSets()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand("select * from student;select top 1 * from student", conn);
+                await conn.OpenAsync();
+
+                using (SqlDataReader dataReader = await command.ExecuteReaderAsync())
+                {
+                    await ReadQueryResults(dataReader);     // read first resultset
+                    await dataReader.NextResultAsync();     // move to next resultset
+                    await ReadQueryResults(dataReader);     // read next resultset
+                }
+                Console.ReadLine();
+            }
+
+        }
+
+        private static async Task ReadQueryResults(SqlDataReader dataReader)
+        {
+            while (await dataReader.ReadAsync())
+            {
+                string formatStringNameWithMiddleName = "Person is named {0} {1} {2}";
+                string formatStringNameWithoutMiddleName = "Person is named {0} {1}";
+
+                if ((dataReader["MiddleName"] != null))
+                    Console.WriteLine(formatStringNameWithMiddleName, dataReader["FirstName"], dataReader["MiddleName"], dataReader["LastName"]);
+                else
+                    Console.WriteLine(formatStringNameWithoutMiddleName, dataReader["FirstName"], dataReader["LastName"]);
+            }
+        }
+    }
+
+    class C4_Listing34
+    {
+        public static async Task Test_UpdateRows()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand("Update student set FirstName = 'John' where LastName = 'Shen'", conn);
+
+                await conn.OpenAsync();
+                int numberofUpdatedRows = await command.ExecuteNonQueryAsync();
+                Console.WriteLine("Updated {0} rows", numberofUpdatedRows);
+                Console.ReadKey();
+            }
+        }
+    }
+
+    class C4_Listing35
+    {
+        public static async Task Test_InsertWithParameterizedQuery()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand("Insert into student (FirstName, age, LastName) values (@FirstName, @Age, @LastName)", conn);
+
+                await conn.OpenAsync();
+                command.Parameters.AddWithValue("@FirstName", "John");
+                command.Parameters.AddWithValue("@LastName", "Doe");
+                command.Parameters.AddWithValue("@Age", 37);
+
+                int numberOfInsertedRows = await command.ExecuteNonQueryAsync();
+                Console.WriteLine("Inserted {0} rows", numberOfInsertedRows);
+                Console.ReadLine();
+            }
+        }
+    }
+    class C4_Listing36
+    {
+        public static void Test_UsingTransactionScope()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["SQL_Connection"].ConnectionString;
+            using (TransactionScope transactionScope = new TransactionScope())
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand command1 = new SqlCommand("insert into student (FirstName, age, LastName) values ('John', 31, 'Doe')", conn);
+                    SqlCommand command2 = new SqlCommand("insert into student (FirstName, age, LastName) values ('Jane', '31k', 'Doe')", conn);
+                }
+                transactionScope.Complete();
+            }
+        }
+    }
+   
+
+    class C4_Listing37_38
+    {
+        public class PeopleContext : DbContext  // to use DbContext class, add EntityFramework 6.1.3 via Nuget console 
+        {
+            public IDbSet<Person> People { get; set; }
+        }
+
+        public class Person
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+        public static void Test_EntityFramework()
+        {
+            using (PeopleContext ctx = new PeopleContext())
+            {
+                ctx.People.Add(new Person() { Id = 1, Name = "John Doe" });
+                ctx.SaveChanges();
+            }
+
+            using (PeopleContext ctx = new PeopleContext())
+            {
+                Person person = ctx.People.SingleOrDefault(p => p.Id == 1);
+                Console.WriteLine(person.Name);
+                Console.ReadLine();
+            }
+        }
+        
+    }
+
+    // unable to setup WCF application(for now) and test the code...
+    //class C4_Listing39
+    //{
+    //    [ServiceContract]
+    //    public class MyService
+    //    {
+    //        [OperationContract]
+    //        public string DoWork(string left, string right)
+    //        {
+    //            return left + right;
+    //        }
+    //    }
+    //}
+    //class C4_Listing40
+    //{
+
+    //}
+    //class C4_Listing41
+    //{
+
+    //}
+
+    //class C4_Listing42
+    //{
+
+    //}
+
+    class C4_Listing43
+    {
+        public static void Test_XmlReader()
+        {
+            string xml = @"<?xml version = ""1.0"" encoding = ""utf-8""?>
+                            <people>
+                              <person firstName = ""john"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>john@unknown.com</emailaddress>
+                                </contactdetails>
+                               </person>
+                              <person firstname = ""jane"" lastname = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>jane@unknown.com</emailaddress>
+                                   <phonenumber>001122334455</phonenumber>
+                                </contactdetails>
+                               </person>
+                             </people>";
+            using (StringReader stringReader = new StringReader(xml))
+            {
+                using (XmlReader xmlReader = XmlReader.Create(stringReader,
+                    new XmlReaderSettings() { IgnoreWhitespace = true }))
+                {
+                    xmlReader.MoveToContent();
+                    xmlReader.ReadStartElement("people");   // if the given element name is not found, an element not found exception will raise
+
+                    string firstName = xmlReader.GetAttribute("firstName");
+                    string lastName = xmlReader.GetAttribute("lastName");
+
+                    Console.WriteLine("Perosn: {0} {1}", firstName, lastName);
+                    xmlReader.ReadStartElement("person");
+
+                    Console.WriteLine("ContactDetails");
+                    xmlReader.ReadStartElement("contactdetails");   // move to next element (emailaddress)
+                    string emailAddress = xmlReader.ReadString();   // show the contents of current element (emailaddress)
+
+                    Console.WriteLine("Email address: {0}", emailAddress);
+                    Console.ReadLine();
+                    
+                }
+            }
+        }
+    }
+    class C4_Listing44
+    {
+        public static void Test_XmlWriter()
+        {
+            StringWriter stream = new StringWriter();
+
+            using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings() { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("People");
+                writer.WriteStartElement("Person");
+                writer.WriteAttributeString("firstName", "John");  // add attributes to Person element
+                writer.WriteAttributeString("lastName", "Doe");
+                writer.WriteStartElement("ContactDetails");
+                writer.WriteElementString("EmailAddress", "john@unknown.com");  // add new element with content
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+                writer.Flush();
+            }
+
+            Console.WriteLine(stream.ToString());
+            Console.ReadLine();
+        }
+    }
+    class C4_Listing45
+    {
+
+    }
+    class C4_Listing46
+    {
+
+    }
+    class C4_Listing47
+    {
+
+    }
 }

@@ -29,6 +29,16 @@ namespace Exam_Ref_70_483
             }
             Console.ReadLine();
         }
+
+        internal class Person
+        {
+            public Person()
+            {
+            }
+
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
     }
 
     class Listing1_23

@@ -231,7 +231,28 @@ namespace Exam_Ref_70_483
             //await C4_Listing25.ExecuteMultipleRequests();
             //C4_Listing27.Test_SqlConnection();
             //C4_Listing28.Test_SqlConnStrBuilder();
-            C4_Listing29_30.Test_Config_File();
+            //C4_Listing29_30.Test_Config_File();
+
+            try
+            {
+                //C4_Listing32.Test_Async_Select_execution().Wait();
+                //C4_Listing33.Test_Async_Select_MultipleResultSets().Wait()
+                //C4_Listing34.Test_UpdateRows().Wait();
+                //C4_Listing35.Test_InsertWithParameterizedQuery().Wait();
+            }
+            catch (AggregateException e)
+            {
+                Console.WriteLine("There are {0} exceptions", e.InnerExceptions.Count);
+                Console.WriteLine("The exception is {0}", e.ToString());
+
+                Console.ReadKey();
+            }
+
+            //C4_Listing36.Test_UsingTransactionScope();
+            //C4_Listing37_38.Test_EntityFramework();
+
+            //C4_Listing43.Test_XmlReader();
+            C4_Listing44.Test_XmlWriter();
         }
     }
 }
