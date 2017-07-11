@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Transactions;
 using System.Data.Entity;
 using System.Xml;
+using System.Xml.XPath;
 
 namespace Exam_Ref_70_483
 {
@@ -689,7 +690,7 @@ namespace Exam_Ref_70_483
                                    <emailaddress>john@unknown.com</emailaddress>
                                 </contactdetails>
                                </person>
-                              <person firstname = ""jane"" lastname = ""doe"">
+                              <person firstfirstNamename = ""jane"" lastName = ""doe"">
                                 <contactdetails>
                                    <emailaddress>jane@unknown.com</emailaddress>
                                    <phonenumber>001122334455</phonenumber>
@@ -747,14 +748,95 @@ namespace Exam_Ref_70_483
     }
     class C4_Listing45
     {
+        public static void Test_XMLDocument()
+        {
+            XmlDocument doc = new XmlDocument();
 
+            string xml = @"<?xml version = ""1.0"" encoding = ""utf-8""?>
+                            <people>
+                              <person firstName = ""john"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>john@unknown.com</emailaddress>
+                                </contactdetails>
+                               </person>
+                              <person firstName = ""jane"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>jane@unknown.com</emailaddress>
+                                   <phonenumber>001122334455</phonenumber>
+                                </contactdetails>
+                               </person>
+                             </people>";
+
+            doc.LoadXml(xml);
+            XmlNodeList nodes = doc.GetElementsByTagName("person");  // get a collection of nodes
+
+            foreach (XmlNode node in nodes)
+            {
+                string firstName = node.Attributes["firstName"].Value;
+                string lastName = node.Attributes["lastName"].Value;
+                Console.WriteLine("Name: {0} {1}", firstName, lastName);
+            }
+
+            Console.WriteLine("doc.CreateNode -------------------");
+
+            XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "Person", "");
+
+            XmlAttribute firstNameAttribute = doc.CreateAttribute("firstName");
+            firstNameAttribute.Value = "Foo";
+
+            XmlAttribute lastNameAttribute = doc.CreateAttribute("lastName");
+            lastNameAttribute.Value = "Bar";
+
+            newNode.Attributes.Append(firstNameAttribute);  // add new attributes to the newNode
+            newNode.Attributes.Append(lastNameAttribute);
+
+            doc.DocumentElement.AppendChild(newNode);   // add newNode to the root element of XmlDocument
+            Console.WriteLine("Modified xml...");
+            doc.Save(Console.Out);
+
+            Console.ReadLine();
+
+        }
     }
     class C4_Listing46
     {
+        public static void Test_XPath_Query()
+        {
+            string xml = @"<?xml version = ""1.0"" encoding = ""utf-8""?>
+                            <people>
+                              <person firstName = ""john"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>john@unknown.com</emailaddress>
+                                </contactdetails>
+                               </person>
+                              <person firstName = ""jane"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>jane@unknown.com</emailaddress>
+                                   <phonenumber>001122334455</phonenumber>
+                                </contactdetails>
+                               </person>
+                             </people>";
 
-    }
-    class C4_Listing47
-    {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xml);
 
+            XPathNavigator nav = doc.CreateNavigator();
+            string query = "//people/person[@lastName = 'doe']";    // you can use this qeury to select from xml file
+            XPathNodeIterator iterator = nav.Select(query);
+
+            Console.WriteLine(iterator.Count);
+
+            while (iterator.MoveNext()) // this iterator is the result set
+            {
+                string firstName = iterator.Current.GetAttribute("firstName", "");
+                string lastName = iterator.Current.GetAttribute("lastName", "");
+                Console.WriteLine("Name: {0} {1}", firstName, lastName);
+            }
+            Console.ReadLine();
+        }
     }
+    //class C4_Listing47
+    //{
+
+    //}
 }

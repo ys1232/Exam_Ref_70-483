@@ -252,7 +252,16 @@ namespace Exam_Ref_70_483
             //C4_Listing37_38.Test_EntityFramework();
 
             //C4_Listing43.Test_XmlReader();
-            C4_Listing44.Test_XmlWriter();
+            //C4_Listing44.Test_XmlWriter();
+            //C4_Listing45.Test_XMLDocument();
+            //C4_Listing46.Test_XPath_Query();
+
+            //------ chapter 4.3
+            //C4_Listing48_50.Test_Object_Initializer();
+            //C4_Listing51.Test_anonymous_and_Lambda();
+            //C4_Listing52.Test_Extension_Method();
+            //C4_Listing53.Test_Anonymoust_Type();
+            C4_Listing54.Test_LINQ_select_Query();
         }
     }
 }
