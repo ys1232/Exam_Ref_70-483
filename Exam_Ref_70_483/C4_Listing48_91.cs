@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Exam_Ref_70_483
 {
@@ -88,66 +89,127 @@ namespace Exam_Ref_70_483
             Console.ReadLine();
         }
     }
-    class C4_Listing55
+    class C4_Listing55_62
     {
+        public static void Test_Select_Operator()
+        {
+            int[] data = { 1, 2, 5, 8, 11 };
+            var result = from d in data select d;
+            Console.WriteLine(String.Join(", ", result));
+            Console.ReadLine();
+        }
 
+        public static void Test_Where_Opertator()
+        {
+            int[] data = { 1, 2, 5, 8, 11 };
+            var result = from d in data
+                         where d > 5
+                         select d;
+            Console.WriteLine(string.Join(", ", result));
+            Console.ReadLine();
+        }
+
+        public static void Test_Orderby_Opertator()
+        {
+            int[] data = { 1, 2, 5, 8, 11 };
+            var result = from d in data
+                         where d > 5
+                         orderby d descending
+                         select d;
+            Console.WriteLine(string.Join(", ", result));
+            Console.ReadLine();
+        }
+        public static void Test_Multiple_From()
+        {
+            int[] data1 = { 1, 2, 5 };
+            int[] data2 = { 2, 4, 6 };
+
+            var result = from d1 in data1
+                         from d2 in data2
+                         select d1 * d2;
+
+            Console.WriteLine(string.Join(", ", result));
+            Console.ReadLine();
+        }
     }
-    class C4_Listing56
+
+    //class C4_Listing63
+    //{
+
+    //}
+    class C4_Listing64_69
     {
+        public static string xml = @"<?xml version = ""1.0"" encoding = ""utf-8""?>
+                            <people>
+                              <person firstName = ""john"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>john@unknown.com</emailaddress>
+                                </contactdetails>
+                               </person>
+                              <person firstName = ""jane"" lastName = ""doe"">
+                                <contactdetails>
+                                   <emailaddress>jane@unknown.com</emailaddress>
+                                   <phonenumber>001122334455</phonenumber>
+                                </contactdetails>
+                               </person>
+                             </people>";
 
-    }
-    class C4_Listing57
-    {
+        public static void Test_Query_XML()
+        {
+            XDocument doc = XDocument.Parse(xml);
+            IEnumerable<string> personName = from p in doc.Descendants("person")  // get a collection of person element from the xml
+                                             select (string)p.Attribute("firstName")    // get the value of firstName and lastName attribute of person element
+                                             + " " + (string)p.Attribute("lastName");
+            foreach (string s in personName)
+                Console.WriteLine(s);
+            Console.ReadLine();
+        }
 
-    }
-    class C4_Listing58
-    {
+        public static void Test_XML_Where_and_OrderBy()
+        {
+            XDocument doc = XDocument.Parse(xml);
+            IEnumerable<string> personName = from p in doc.Descendants("person")
+                                             where p.Descendants("phonenumber").Any()  // select the person node with phonenumber element
+                                             let name = (string)p.Attribute("firstName") + " " +
+                                             (string)p.Attribute("lastName")
+                                             orderby name
+                                             select name;  // get all firstName and lastName for such elements
 
-    }
-    class C4_Listing59
-    {
+            foreach (string s in personName)
+                Console.WriteLine(s);
+            Console.ReadLine();
+        }
 
-    }
-    class C4_Listing60
-    {
+        public static void Test_CreateXML_WithXElement()
+        {
+            XElement root = new XElement("Root", new List<XElement>  // add three elements and one attribute to the roor element
+            {
+                new XElement("Child1"),
+                new XElement("Child2"),
+                new XElement("Child3")
+            }, new XAttribute("MyAttribute", 42));
 
-    }
-    class C4_Listing61
-    {
+            root.Save("test.xml"); // this xml file is saved in the bin/Debug/ folder under the project
+        }
 
-    }
-    class C4_Listing62
-    {
+        public static void Test_Update_XML()  // trying to figure out how to update attribute value in xml
+        {
+            XElement root = XElement.Parse(xml);
 
-    }
-    class C4_Listing63
-    {
+            foreach (XElement p in root.Descendants("Person"))
+            {
+                string name = (string)p.Attribute("firstName") + (string)p.Attribute("lastName");
+                p.SetAttributeValue("lastName",123); // add IsMale attribute to John
+                XElement contactDetails = p.Element("ContactDetails");  // if there is no PhoneNumber element under ContactDetails,add PhoneNumber
+                if (!contactDetails.Descendants("PhoneNumber").Any())
+                    contactDetails.Add(new XElement("PhoneNumber", "001122334455"));
+            }
 
+            Console.WriteLine(root.ToString());
+            Console.ReadLine();
+        }
     }
-    class C4_Listing64
-    {
 
-    }
-    class C4_Listing65
-    {
-
-    }
-    class C4_Listing66
-    {
-
-    }
-    class C4_Listing67
-    {
-
-    }
-    class C4_Listing68
-    {
-
-    }
-    class C4_Listing69
-    {
-
-    }
     class C4_Listing70
     {
 

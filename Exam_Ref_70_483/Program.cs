@@ -261,7 +261,16 @@ namespace Exam_Ref_70_483
             //C4_Listing51.Test_anonymous_and_Lambda();
             //C4_Listing52.Test_Extension_Method();
             //C4_Listing53.Test_Anonymoust_Type();
-            C4_Listing54.Test_LINQ_select_Query();
+            //C4_Listing54.Test_LINQ_select_Query();
+
+            //C4_Listing55_62.Test_Select_Operator();
+            //C4_Listing55_62.Test_Where_Opertator();
+            //C4_Listing55_62.Test_Orderby_Opertator();
+            //C4_Listing55_62.Test_Multiple_From();
+            //C4_Listing64_69.Test_Query_XML();
+            //C4_Listing64_69.Test_XML_Where_and_OrderBy();
+            //C4_Listing64_69.Test_CreateXML_WithXElement();
+            C4_Listing64_69.Test_Update_XML();
         }
     }
 }
