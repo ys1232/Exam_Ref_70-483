@@ -196,22 +196,50 @@ namespace Exam_Ref_70_483
         {
             XElement root = XElement.Parse(xml);
 
-            foreach (XElement p in root.Descendants("Person"))
+            foreach (XElement p in root.Descendants("person"))
             {
                 string name = (string)p.Attribute("firstName") + (string)p.Attribute("lastName");
                 p.SetAttributeValue("lastName",123); // add IsMale attribute to John
-                XElement contactDetails = p.Element("ContactDetails");  // if there is no PhoneNumber element under ContactDetails,add PhoneNumber
-                if (!contactDetails.Descendants("PhoneNumber").Any())
-                    contactDetails.Add(new XElement("PhoneNumber", "001122334455"));
+                XElement contactDetails = p.Element("contactdetails");  // if there is no PhoneNumber element under ContactDetails,add PhoneNumber
+                if (!contactDetails.Descendants("phonenumber").Any())
+                    contactDetails.Add(new XElement("phonenumber", "001122334455"));
             }
 
             Console.WriteLine(root.ToString());
+            Console.ReadLine();
+        }
+
+        public static void Test_Transforming_XML()
+        {
+            XElement root = XElement.Parse(xml);
+
+            XElement newTree = new XElement("people", from p in root.Descendants("person")
+                                                      let name = (string)p.Attribute("firstName") + (string)p.Attribute("lastName")
+                                                      let contactDetails = p.Element("contactdetails")
+                                                      select new XElement("person",
+                                                      new XAttribute("IsMale", name.Contains("John")),
+                                                      p.Attributes(),
+                                                      new XElement("contactdetails",
+                                                           contactDetails.Element("emailaddress"),
+                                                           contactDetails.Element("phonenumber")
+                                                           ?? new XElement("phonenumber", "1122334455")
+                                                      )));
+
+            Console.WriteLine(newTree.ToString());
             Console.ReadLine();
         }
     }
 
     class C4_Listing70
     {
+        [Serializable]
+        public class Peson
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public int Age { get; set; }
+        }
+
 
     }
     class C4_Listing71
