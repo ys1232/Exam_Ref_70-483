@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Serialization;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Exam_Ref_70_483
 {
@@ -230,37 +234,237 @@ namespace Exam_Ref_70_483
         }
     }
 
-    class C4_Listing70
+    public class C4_Listing70
     {
         [Serializable]
-        public class Peson
+        public class Person
         {
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public int Age { get; set; }
         }
 
+        public static void Test_XmlSerializer()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(Person));  // to serialize object of the specified type into a XML document 
+            string xml;                                                    // here we use Person as the type
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Person p = new Person
+                {
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Age = 42
+                };
+
+                serializer.Serialize(stringWriter, p);  // serialize the specified object and writes the xml document to a textWriter
+                xml = stringWriter.ToString();      // the object Person is converted into a xml document now
+            }
+
+            Console.WriteLine(xml);
+
+            using (StringReader stringReader = new StringReader(xml))
+            {
+                Person p = (Person)serializer.Deserialize(stringReader);    //deserialze the xml document, then convert to the specified type
+                Console.WriteLine("{0} {1} is {2} years old", p.FirstName, p.LastName, p.Age);            
+            }
+
+            Console.ReadLine();
+        }
+
 
     }
-    class C4_Listing71
+    public class C4_Listing71_72   // the xml document in this example is complex engough in real life
     {
+        //[Serializable]
+        //public class Person
+        //{
+        //    public string FirstName { get; set; }
+        //    public string LastName { get; set; }
+        //    public int Age { get; set; }
+        //}
 
-    }
-    class C4_Listing72
-    {
+        [Serializable]
+        public class Order
+        {
+            [XmlAttribute]  // ID is an attribute of element Order
+            public int ID { get; set;}
 
+            [XmlIgnore]
+            public bool IsDirty { get; set; } // IsDirty memeber is ignored when generating xml document
+
+            [XmlArray("Lines")]     // defined hierarchy structure of elements
+            [XmlArrayItem("OrderLine")]
+            public List<OrderLine> OrderLines { get; set; }
+        }
+
+        [Serializable]
+        public class VIPOrder : Order
+        {
+            public string Description { get; set;}   // VIPOrder has an extra attribute, Description
+        }
+
+        [Serializable]
+        public class OrderLine  // OrderLine element has two attributes and one sub-element OrderedProduct
+        {
+            [XmlAttribute]
+            public int ID { get; set; }
+
+            [XmlAttribute]
+            public int Amount { get; set;}
+
+            [XmlElement("OrderedProduct")]
+            public Product Product { get; set; }
+        }
+
+        [Serializable]
+        public class Product    // element Product ( use OrderedProduct as element name in xml document) has one attribute and two sub-elements
+        {
+            [XmlAttribute]
+            public int ID { get; set; }
+            public decimal Price { get; set; }
+            public string Description { get; set; }
+        }
+
+
+        public static Order CreateOrder()
+        {
+            Product p1 = new Product { ID = 1, Description = "p2", Price = 9 };
+            Product p2 = new Product { ID = 2, Description = "p3", Price = 6 };
+
+            Order order = new VIPOrder  // order is the top level element in this xml structure
+            {
+                ID = 4,
+                Description = "Order for John Doe. Use the nice giftwrap",
+                OrderLines = new List<OrderLine>
+                {
+                    new OrderLine { ID = 5, Amount = 1, Product = p1},
+                    new OrderLine {ID = 6, Amount = 10, Product = p2 }
+                }
+            };
+            return order;
+        }
+
+        public static void Test_XMLAttribute()
+        {
+
+            XmlSerializer serializer = new XmlSerializer(typeof(Order), new Type[] { typeof(VIPOrder) });
+            string xml;
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Order order = CreateOrder();
+                serializer.Serialize(stringWriter, order);  // serialize the order object to xml document
+                xml = stringWriter.ToString();
+            }
+            Console.WriteLine(xml);
+
+            using (StringReader stringReader = new StringReader(xml))
+            {
+                Order o = (Order)serializer.Deserialize(stringReader);
+                Console.WriteLine("The orderId is:{0}, there are {1} OrderLines in this order", o.ID, o.OrderLines.Count);
+            }
+            
+            Console.ReadLine();
+
+        }
     }
+
     class C4_Listing73
     {
+        [Serializable]
+        public class Person
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public bool isDirty = false;
+        }
 
-    }
-    class C4_Listing74
-    {
+        public static void Test_binary_serialization()
+        {
+            Person p = new Person
+            {
+                Id = 1,
+                Name = "John Doe"
+            };
 
+            IFormatter formatter = new BinaryFormatter();
+            using (Stream stream = new FileStream("data.bin", FileMode.Create))
+            {
+                formatter.Serialize(stream, p); //daa.bin is saved in the bin\Debug folder under project. And the data in this file is in binary format, unreadable...
+            }
+
+            using (Stream stream = new FileStream("data.bin", FileMode.Open))
+            {
+                Person dp = (Person)formatter.Deserialize(stream);
+                Console.WriteLine("The person id is:{0}, name is:{1}", dp.Id, dp.Name);
+            }
+
+            Console.ReadLine();
+        }
     }
+    //class C4_Listing74  // no need to test this listing
+    //{
+
+    //}
     class C4_Listing75
     {
+        // you can run custom functions during four phases of serializing and deserializing
+        [Serializable]
+        public class Person
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            [NonSerialized]  // like the XmlIgnore attribute when using XmlSerializer
+            public bool isDirty = false;
 
+            [OnSerializing()]
+            internal void OnSerializingMethod(StreamingContext context)
+            {
+                Console.WriteLine("OnSerializing.");
+            }
+
+            [OnSerialized()]
+            internal void OnSerializedMethod(StreamingContext context)
+            {
+                Console.WriteLine("OnSerialized.");
+            }
+
+            [OnDeserializing()]
+            internal void OnDeserializingMethod(StreamingContext context)
+            {
+                Console.WriteLine("OnSerializing.");
+            }
+
+            [OnDeserialized()]
+            internal void OnDeserializedMethod(StreamingContext context)
+            {
+                Console.WriteLine("OnDeserialized.");
+            }
+        }
+
+        public static void Test_Influencing_binary_serialization()
+        {
+            Person p = new Person
+            {
+                Id = 1,
+                Name = "John Doe"
+            };
+
+            IFormatter formatter = new BinaryFormatter();
+            using (Stream stream = new FileStream("data.bin", FileMode.Create))
+            {
+                formatter.Serialize(stream, p); //daa.bin is saved in the bin\Debug folder under project. And the data in this file is in binary format, unreadable...
+            }
+            Console.WriteLine("the data is serialized");
+
+            using (Stream stream = new FileStream("data.bin", FileMode.Open))
+            {
+                Person dp = (Person)formatter.Deserialize(stream);
+                Console.WriteLine("The person id is:{0}, name is:{1}", dp.Id, dp.Name);
+            }
+
+            Console.ReadLine();
+        }
     }
     class C4_Listing76
     {

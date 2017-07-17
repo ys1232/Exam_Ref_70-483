@@ -271,7 +271,11 @@ namespace Exam_Ref_70_483
             //C4_Listing64_69.Test_XML_Where_and_OrderBy();
             //C4_Listing64_69.Test_CreateXML_WithXElement();
             //C4_Listing64_69.Test_Update_XML();
-            C4_Listing64_69.Test_Transforming_XML();
+            //C4_Listing64_69.Test_Transforming_XML();
+            //C4_Listing70.Test_XmlSerializer();
+            //C4_Listing71_72.Test_XMLAttribute();
+            //C4_Listing73.Test_binary_serialization();
+            C4_Listing75.Test_Influencing_binary_serialization();
         }
     }
 }
