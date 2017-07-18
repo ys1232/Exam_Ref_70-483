@@ -8,6 +8,9 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Permissions;
+using System.Runtime.Serialization.Json;
+using System.Collections;
 
 namespace Exam_Ref_70_483
 {
@@ -468,39 +471,197 @@ namespace Exam_Ref_70_483
     }
     class C4_Listing76
     {
+        [Serializable]
+        public class PersonComplex : ISerializable
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            private bool isDirty = false;
+            public PersonComplex() { }
+            protected PersonComplex(SerializationInfo info, StreamingContext context)
+            {
+                Id = info.GetInt32("Value1");
+                Name = info.GetString("Value2");
+                isDirty = info.GetBoolean("Value3");
+            }
 
+            [System.Security.Permissions.SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+            public void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                info.AddValue("Value1", Id);
+                info.AddValue("Value2", Name);
+                info.AddValue("Value3", isDirty);
+            }
+        }
     }
-    class C4_Listing77
+    class C4_Listing77_78
     {
+        [DataContract]
+        public class PersonDataContract
+        {
+            [DataMember]
+            public int Id { get; set; }
+            [DataMember]
+            public string Name { get; set; }
 
-    }
-    class C4_Listing78
-    {
+            private bool isDirty = false;   // isDirty is not DataMember, it is ignored
+        }
 
+        public static void Test_DataContractSerializer()
+        {
+            PersonDataContract p = new PersonDataContract
+            {
+                Id = 1,
+                Name = "John Doe"
+            };
+
+            using (Stream stream = new FileStream("data.xml", FileMode.Create)) // data.xml file is created in the \bin\Debug folder under the project folder 
+            {
+                // DataContractSerializer can serialize your object to XML or JSON
+                DataContractSerializer ser = new DataContractSerializer(typeof(PersonDataContract));
+                ser.WriteObject(stream, p);
+            }
+
+            using (Stream stream = new FileStream("data.xml", FileMode.Open))
+            {
+                // Deserialize your xml or JSON to object
+                DataContractSerializer ser = new DataContractSerializer(typeof(PersonDataContract));
+                PersonDataContract result = (PersonDataContract)ser.ReadObject(stream);
+
+                Console.WriteLine("Id is:{0}, Name is:{1}", result.Id, result.Name);
+            }
+            Console.ReadLine();
+        }
     }
+
     class C4_Listing79
     {
+        [DataContract]
+        public class Person
+        {
+            [DataMember]
+            public int Id { get; set; }
+            [DataMember]
+            public string Name { get; set; }
+        }
 
+        public static void Test_Json_Serializer()
+        {
+            Person p = new Person
+            {
+                Id = 1,
+                Name = "John Doe"
+            };
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // similar to DataContractSerializer for XML, here we write the json data into memorystream instead of fileStream
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Person));
+                ser.WriteObject(stream, p);
+
+                stream.Position = 0;
+                StreamReader streamReader = new StreamReader(stream);
+                Console.WriteLine(streamReader.ReadToEnd());    // read data from MemoryStream
+
+                stream.Position = 0;
+                Person result = (Person)ser.ReadObject(stream); // deserialize the json string to object
+                Console.WriteLine("ID is: {0}, Name is: {1}", result.Id, result.Name);
+            }
+            Console.ReadLine();
+        }
+        
     }
-    class C4_Listing80
+
+    //  ----------  Chapter 4.5 ----------------
+    class C4_Listing80_82
     {
+        public static void Test_Using_Array()
+        {
+            int[] arrayOfInt = new int[10];
 
-    }
-    class C4_Listing81
-    {
+            for (int x = 0; x < arrayOfInt.Length; x++)
+                arrayOfInt[x] = x;
+            foreach (int i in arrayOfInt)
+                Console.Write(i);
+            Console.ReadLine();
+        }
 
-    }
-    class C4_Listing82
-    {
+        public static void Test_Using_2D_Array()
+        {
+            string[,] array2D = new string[3, 2] { { "one", "two" }, { "three", "four" }, { "five", "six" } };
+            Console.WriteLine(array2D[0, 0]);
+            Console.WriteLine(array2D[0, 1]);
+            Console.WriteLine(array2D[1, 0]);
+            Console.WriteLine(array2D[1, 1]);
+            Console.WriteLine(array2D[2, 0]);
+            Console.WriteLine(array2D[2, 1]);
 
+            Console.ReadLine();
+        }
+
+        public static void Test_Using_jagged_array()
+        {
+            int[][] jaggedArray =
+            {
+                new int[] {1,3,5,7,9 },
+                new int[] {0,2,4,6 },
+                new int[] {42,21 }
+            };
+            // jagged_array and 2D_array are different, here you can not use [0,4]. similaily, you cannot use [0][1] in 2D array
+            Console.WriteLine(jaggedArray[0][4].ToString());
+            Console.WriteLine(jaggedArray[1][3].ToString());
+            Console.WriteLine(jaggedArray[2][0].ToString());
+            Console.ReadLine();
+        }
     }
+
     class C4_Listing83
     {
+        // here IList and ICollection are only interface, so we ony show the attribute and function signature, no function implementation
+        public interface IList<T> : ICollection<T>, IEnumerable<T>, IEnumerable
+        {
+            // based on ICollection, IList adds more functions to List
+           T this[int index] { get; set; }
+            int IndexOf(T item);
+            void Insert(int index, T item);
+            void RemoveAt(int index);
+        }
+
+        public interface ICollection<T> : IEnumerable<T>, IEnumerable
+        {
+            // ICollection contains most functions of List
+            int Count { get; }
+            bool IsReadOnly { get; }
+            void Add(T item);
+            void Clear();
+            bool Contains(T item);
+            void CopyTo(T[] array, int arrayIndex);
+            bool Remove(T item);
+        }
 
     }
     class C4_Listing84
     {
+        public static void Test_Generic_List()
+        {
+            List<string> listOfStrings = new List<string> { "a","b","c","d","e"};
+            for (int x = 0; x < listOfStrings.Count; x++)
+                Console.Write(listOfStrings[x]);
 
+            Console.WriteLine();
+            // test Remove function
+            listOfStrings.Remove("a"); 
+            Console.WriteLine(listOfStrings[0]);
+
+            // test Add function
+            listOfStrings.Add("f");
+            Console.WriteLine(listOfStrings.Count);
+
+            //test Contains function
+            bool hasC = listOfStrings.Contains("c");
+            Console.WriteLine(hasC);
+
+            Console.ReadLine();
+        }
     }
     class C4_Listing85
     {

@@ -275,7 +275,16 @@ namespace Exam_Ref_70_483
             //C4_Listing70.Test_XmlSerializer();
             //C4_Listing71_72.Test_XMLAttribute();
             //C4_Listing73.Test_binary_serialization();
-            C4_Listing75.Test_Influencing_binary_serialization();
+            //C4_Listing75.Test_Influencing_binary_serialization();
+            //C4_Listing77_78.Test_DataContractSerializer();
+            //C4_Listing79.Test_Json_Serializer();
+
+
+            //------------------ Chapter 4.5 ------------------------
+            //C4_Listing80_82.Test_Using_Array();
+            //C4_Listing80_82.Test_Using_2D_Array();
+            //C4_Listing80_82.Test_Using_jagged_array();
+            C4_Listing84.Test_Generic_List();
         }
     }
 }
