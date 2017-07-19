@@ -663,32 +663,201 @@ namespace Exam_Ref_70_483
             Console.ReadLine();
         }
     }
+
     class C4_Listing85
     {
+        public class Person
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            private bool isDirty = false;
+        }
 
+        public static void Test_Dictionary()
+        {
+            Person p1 = new Person { Id = 1, Name = "Name1" };
+            Person p2 = new Person { Id = 2, Name = "Name2" };
+            Person p3 = new Person { Id = 3, Name = "Name3" };
+
+            var dict = new Dictionary<int, Person>();
+            dict.Add(p1.Id, p1);
+            dict.Add(p2.Id, p2);
+            dict.Add(p3.Id, p3);
+
+            foreach (KeyValuePair<int, Person> v in dict)
+            {
+                Console.WriteLine("{0} : {1}", v.Key, v.Value.Name);
+            }
+
+            dict[0] = new Person {Id = 4, Name = "Name4" };
+
+            Person result;
+            if (!dict.TryGetValue(5, out result))
+            {
+                Console.WriteLine("No person with a key of 5 can be found");
+            }
+
+            Console.ReadLine();
+        }
     }
-    class C4_Listing86
+    class C4_Listing86_87
     {
+        public interface ISet<T> : ICollection<T>, IEnumerable<T>, IEnumerable
+        {
+            // all function signatures of ISet interface
+            // HashSet implements the ISet<T> interface
+            bool Add(T item);
+            void ExceptWith(IEnumerable<T> other);
+            void IntersectWith(IEnumerable<T> other);
+            bool IsProperSubsetOf(IEnumerable<T> other);
+            bool IsProperSupersetOf(IEnumerable<T> other);
+            bool IsSubsetOf(IEnumerable<T> other);
+            bool IsSupersetOf(IEnumerable<T> other);
+            bool Overlaps(IEnumerable<T> other);
+            bool SetEquals(IEnumerable<T> other);
+            void SymmetricExceptWith(IEnumerable<T> other);
+            void UnionWith(IEnumerable<T> other);
+        }
 
-    }
-    class C4_Listing87
-    {
+        public static void Test_UseHashSet()
+        {
+            HashSet<int> oddSet = new HashSet<int>();
+            HashSet<int> evenSet = new HashSet<int>();
 
+            for (int x = 1; x <= 10; x++)
+            {
+                if (x % 2 == 0)
+                    evenSet.Add(x); // Add function
+                else
+                    oddSet.Add(x);
+            }
+
+            DisplaySet(oddSet);
+            DisplaySet(evenSet);
+
+            oddSet.UnionWith(evenSet);  // UnionWith function
+            DisplaySet(oddSet);
+
+            Console.ReadLine();
+        }
+
+        private static void DisplaySet(HashSet<int> set)
+        {
+            Console.Write("{");
+            foreach (int i in set)  // you can use foreach to access each element, but there is no index like array
+            {
+                Console.Write(" {0} ", i);
+            }
+            Console.WriteLine("}");
+        }
     }
     class C4_Listing88
     {
+        public static void Test_Queue()
+        {
+            Queue<string> myQueue = new Queue<string>();
+            myQueue.Enqueue("Hello");
+            myQueue.Enqueue("World");
+            myQueue.Enqueue("From");
+            myQueue.Enqueue("A");
+            myQueue.Enqueue("Queue");
 
+            Queue<string> myQueue_2 = new Queue<string>();
+            myQueue_2.Enqueue("Hello");
+            myQueue_2.Enqueue("World");
+            myQueue_2.Enqueue("From");
+            myQueue_2.Enqueue("A");
+            myQueue_2.Enqueue("Queue");
+
+            Console.WriteLine(myQueue.Peek());  // peek return the first added element, but doesn't remove element
+            Console.WriteLine(myQueue_2.Peek());
+
+            foreach (string s in myQueue)
+            {
+                Console.WriteLine(s);
+                Console.WriteLine(myQueue_2.Dequeue());  // you have to use two queues. modify the queue while looping is not allowed
+            }
+
+            // now you can dequeue from myQueue, but cannot dequeue from myQueue_2 which is an empty queue
+            Console.WriteLine(myQueue.Dequeue());
+            //Console.WriteLine(myQueue_2.Dequeue());
+            Console.ReadLine();
+        }
     }
     class C4_Listing89
     {
+        public static void Test_Stack()
+        {
+            Stack<string> myStack = new Stack<string>();
+            myStack.Push("Hello");
+            myStack.Push("World");
+            myStack.Push("From");
+            myStack.Push("A");
+            myStack.Push("Stack");
 
+            Stack<string> myStack_2 = new Stack<string>();
+            myStack_2.Push("Hello");
+            myStack_2.Push("World");
+            myStack_2.Push("From");
+            myStack_2.Push("A");
+            myStack_2.Push("Stack");
+
+            Console.WriteLine(myStack.Peek());  // peek return the first added element, but doesn't remove element
+            Console.WriteLine(myStack_2.Peek());
+
+            foreach (string s in myStack)  // so the foreach is in the same order, LIFO
+            {
+                Console.WriteLine(s);
+                Console.WriteLine(myStack_2.Pop());  // you have to use two queues. modify the queue while looping is not allowed
+            }
+
+            // now you can dequeue from myQueue, but cannot dequeue from myQueue_2 which is an empty queue
+            Console.WriteLine(myStack.Pop());
+            //Console.WriteLine(myStack_2.Pop());
+            Console.ReadLine();
+        }
     }
-    class C4_Listing90
+    class C4_Listing90_91
     {
+        public class Person
+        {
+            public int Age { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
 
-    }
-    class C4_Listing91
-    {
+        public class PeopleCollection : List<Person>
+        {
+            public void RemoveByAge(int age)
+            {
+                for (int index = this.Count - 1; index >= 0; index--)
+                {
+                    if (this[index].Age == age)
+                        this.RemoveAt(index);
+                }
+            }
 
+            public override string ToString()
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (Person p in this)
+                    sb.AppendFormat("{0} {1} is {2}. ", p.FirstName, p.LastName, p.Age);
+                return sb.ToString();
+            }
+        }
+
+        public static void Test_Custom_Collection()
+        {
+            Person p1 = new Person { FirstName = "John", LastName = "Doe", Age = 42 };
+            Person p2 = new Person { FirstName = "Jane", LastName = "Doe", Age = 21 };
+
+            PeopleCollection people = new PeopleCollection { p1, p2 };
+            Console.WriteLine(people.ToString());  // the overridden ToString function
+            people.RemoveByAge(42); // RemoveByAge is a custom function of PeopleCollection
+            Console.WriteLine(people.Count);      
+            Console.WriteLine(people.ToString());  // the overridden ToString function
+            Console.ReadLine();
+        }
     }
+
 }

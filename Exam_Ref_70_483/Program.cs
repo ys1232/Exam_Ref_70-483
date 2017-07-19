@@ -284,7 +284,12 @@ namespace Exam_Ref_70_483
             //C4_Listing80_82.Test_Using_Array();
             //C4_Listing80_82.Test_Using_2D_Array();
             //C4_Listing80_82.Test_Using_jagged_array();
-            C4_Listing84.Test_Generic_List();
+            //C4_Listing84.Test_Generic_List();
+            //C4_Listing85.Test_Dictionary();
+            //C4_Listing86_87.Test_UseHashSet();
+            //C4_Listing88.Test_Queue();
+            //C4_Listing89.Test_Stack();
+            //C4_Listing90_91.Test_Custom_Collection();
         }
     }
 }
